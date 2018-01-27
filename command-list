@@ -1,8 +1,24 @@
+# to add changes to the code you did to the repository
 git add .
 git commit -m "explain why you add this change"
 git remote add origin https://github.com/arbuz001/fx-historical.git
 git push -u origin master
 
+# to update your local copy and get all the latest chages from the repositry
+git pull origin master
+
+# to see the log of changes
+git log
+
+# to see all the differences
 git diff --author="arbuz001"
 
-git pull origin master
+# to hard revert all the local differences
+git checkout path/to/revert
+git checkout -- .
+
+
+
+
+
+
