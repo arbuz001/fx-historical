@@ -17,8 +17,20 @@ git diff --author="arbuz001"
 git checkout path/to/revert
 git checkout -- .
 
+# get autocompletion in python
+import rlcompleter
+import readline
+readline.parse_and_bind("tab: complete")
+
+# get current working directory
+import os
+cwd = os.getcwd()
 
 
+# add directories to import modules from
+import sys
+from pprint import pprint
 
-
-
+pprint(sys.path)
+sys.path.insert(0, "/home/alex/Documents/kaggle/data-fx-historical/code/")
+pprint(sys.path)
