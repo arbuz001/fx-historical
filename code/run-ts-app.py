@@ -3,44 +3,43 @@ Contains code to explore different methods for financial time series
 https://www.analyticsvidhya.com/blog/2016/02/time-series-forecasting-codes-python/
 https://machinelearningmastery.com/time-series-prediction-lstm-recurrent-neural-networks-python-keras/
 '''
-from datetime import datetime
-from matplotlib.pylab import rcParams
-from statsmodels.tsa.arima_model import ARIMA
-from statsmodels.tsa.stattools import acf, pacf
-from statsmodels.tsa.stattools import adfuller
-from statsmodels.tsa.seasonal import seasonal_decompose
-
 import matplotlib.pylab as plt
+import mlpy
 import numpy as np
 import os
 import pandas as pd
-import mlpy
 
-# import paths
+from datetime import datetime
+from matplotlib.pylab import rcParams
+from statsmodels.tsa.arima_model import ARIMA
+from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.tsa.stattools import acf, pacf
+from statsmodels.tsa.stattools import adfuller
 
-# import your own custom module
-import sys
-sys.path.append(os.path.abspath("/home/alex/Documents/kaggle/data-fx-historical/code"))
+# import custom functions from custom module
 from fnTestStationarity import *
 from fnScaleData import *
 from fnWriteIntermediateLog import *
 
 bPlot = True
 
-# all project foldres consolidated
-strPrjPath	= '/home/alex/Documents/kaggle/data-fx-historical'
-strDataPath	= strPrjPath + '/data/'
-
+# all project foldres are already defined in init-all.py
 
 # loading and handling data
 strDateFormat	= '%Y-%m-%d'
 dateparse		= lambda dates: pd.datetime.strptime(dates, strDateFormat)
 
-strFileIn1	= strDataPath + 'EUR.SP350.trimmed.csv'
-data 		= pd.read_csv(strFileIn1, parse_dates = ['YYYY-MM-DD'], index_col = ['YYYY-MM-DD'], date_parser = dateparse)
+strFileIn	= strDataPath + 'EUR.SP350.trimmed.csv'
+data 		= pd.read_csv(strFileIn, parse_dates = ['YYYY-MM-DD'], index_col = ['YYYY-MM-DD'], date_parser = dateparse)
 # print '\n Data Types:'
 # print data.dtypes
 print data.head()
+
+# example on how to use distance between time series
+x = [0,0,0,0,1,1,2,2,3,2,1,1,0,0,0,0]
+y = [0,0,1,1,2,2,3,3,3,3,2,2,1,1,0,0]
+dist, cost, path = mlpy.dtw_std(x, y, dist_only=False)
+dist, cost, path = mlpy.dtw_std(gSP350Eur, gREA, dist_only=False)
 
 data.index
 gSP350Eur = data['EUR-SP350']
@@ -54,22 +53,12 @@ gREA.head(10)
 gSP350EurScaled	= fnScaleData(gSP350Eur)
 gREAScaled 		= fnScaleData(gREA)
 
-# import mlpy
-# import matplotlib.pyplot as plt
-# import matplotlib.cm as cm
-x = [0,0,0,0,1,1,2,2,3,2,1,1,0,0,0,0]
-y = [0,0,1,1,2,2,3,3,3,3,2,2,1,1,0,0]
-dist, cost, path = mlpy.dtw_std(x, y, dist_only=False)
-
-dist, cost, path = mlpy.dtw_std(gSP350Eur, gREA, dist_only=False)
-
 if bPlot: 
 	plt.plot(gSP350EurScaled)
 	plt.plot(gREAScaled, color='red')
 	plt.title('Scaled time series')
 	plt.legend()		
 	plt.show()
-
 
 # decomposing time series
 gSP350EurScaledDecompose	= seasonal_decompose(gSP350EurScaled, freq = 12)
@@ -111,10 +100,10 @@ if bPlot:
 	plt.show()
 
     
-strLogFile = "/home/alex/Documents/kaggle/data-fx-historical/data/out/gSP350EurSeasonal.csv"
+strLogFile = strPrjPath + " /gSP350EurSeasonal.csv"
 fnWriteIntermediateLog(gSP350EurSeasonal.values, strLogFile)	
 
-strLogFile = "/home/alex/Documents/kaggle/data-fx-historical/data/out/gREASeasonal.csv"
+strLogFile = strPrjPath + " /gREASeasonal.csv"
 fnWriteIntermediateLog(gREASeasonal.values, strLogFile)
 
 (gSP350EurTrend).dropna(inplace=True)

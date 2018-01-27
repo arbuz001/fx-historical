@@ -18,8 +18,8 @@ readline.parse_and_bind("tab: complete")
 pprint(sys.path)
 
 # path to all project foldres
-strDataPath = strPrjPath + '/data'
-strDataCode = strPrjPath + '/code'
+strDataPath = strPrjPath + '/data/'
+strDataCode = strPrjPath + '/code/'
 
 sys.path.insert(0, strDataPath)
 sys.path.insert(0, strDataCode)
