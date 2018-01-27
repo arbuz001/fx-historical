@@ -1,0 +1,4 @@
+git add .
+git commit -m "explain why you add this change"
+git remote add origin https://github.com/arbuz001/fx-historical.git
+git push -u origin master
