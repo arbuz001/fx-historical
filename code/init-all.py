@@ -1,13 +1,13 @@
 '''
-Contains paths to data and submission folders
+First run this file to initialize paths to data and core functions
 '''
 
 strPrjPath = '/home/alex/Documents/kaggle/data-fx-historical'
 
 import os
-import sys
-import rlcompleter
 import readline
+import rlcompleter
+import sys
 
 from pprint import pprint
 
@@ -17,7 +17,7 @@ readline.parse_and_bind("tab: complete")
 # 1. print all current sys.paths (i.e. locations where python looks for modules)
 pprint(sys.path)
 
-# all project foldres consolidated
+# path to all project foldres
 strDataPath = strPrjPath + '/data'
 strDataCode = strPrjPath + '/code'
 
