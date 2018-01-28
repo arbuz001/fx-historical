@@ -11,6 +11,7 @@ import pandas as pd
 
 from datetime import datetime
 from matplotlib.pylab import rcParams
+from scipy.stats.stats import pearsonr
 from statsmodels.tsa.arima_model import ARIMA
 from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.stattools import acf, pacf
@@ -19,137 +20,80 @@ from statsmodels.tsa.stattools import adfuller
 # import custom functions from custom module
 from fnTestStationarity import *
 from fnScaleData import *
+from fnUnScaleData import *
 from fnWriteIntermediateLog import *
 
-bPlot = True
-
+bPlot	= True
+bLog	= True
 # all project foldres are already defined in init-all.py
 
 # loading and handling data
 strDateFormat	= '%Y-%m-%d'
 dateparse		= lambda dates: pd.datetime.strptime(dates, strDateFormat)
 
-strFileIn	= strDataPath + 'EUR.SP350.trimmed.csv'
+strFileIn	= strDataPath + 'USD.RUB.trimmed.csv'
 data 		= pd.read_csv(strFileIn, parse_dates = ['YYYY-MM-DD'], index_col = ['YYYY-MM-DD'], date_parser = dateparse)
 # print '\n Data Types:'
 # print data.dtypes
 print data.head()
 
-# example on how to use distance between time series
-x = [0,0,0,0,1,1,2,2,3,2,1,1,0,0,0,0]
-y = [0,0,1,1,2,2,3,3,3,3,2,2,1,1,0,0]
-dist, cost, path = mlpy.dtw_std(x, y, dist_only=False)
-dist, cost, path = mlpy.dtw_std(gSP350Eur, gREA, dist_only=False)
-
 data.index
-gSP350Eur = data['EUR-SP350']
+gSP350Eur = data['RUB-USD']
 gSP350Eur.head(10)
 
-strFileIn2	= strDataPath + 'REA.trimmed.csv'
-data	= pd.read_csv(strFileIn2, parse_dates = ['YYYY-MM-DD'], index_col = ['YYYY-MM-DD'], date_parser = dateparse)
-gREA	= data['REA']
-gREA.head(10)
-
-gSP350EurScaled	= fnScaleData(gSP350Eur)
-gREAScaled 		= fnScaleData(gREA)
-
-if bPlot: 
-	plt.plot(gSP350EurScaled)
-	plt.plot(gREAScaled, color='red')
-	plt.title('Scaled time series')
-	plt.legend()		
-	plt.show()
-
-# decomposing time series
-gSP350EurScaledDecompose	= seasonal_decompose(gSP350EurScaled, freq = 12)
-gSP350EurTrend				= gSP350EurScaledDecompose.trend
-gSP350EurSeasonal			= gSP350EurScaledDecompose.seasonal
-# gSP350EurResidual			= gSP350EurScaledDecompose.resid
-
-gREADecompose	= seasonal_decompose(gREAScaled, freq = 12)
-gREATrend		= gREADecompose.trend
-gREASeasonal	= gREADecompose.seasonal
-
-# if bPlot: 
-	# plt.plot(gSP350EurTrend)
-	# plt.plot(gSP350EurSeasonal, color='red')
-	# plt.plot(gSP350EurResidual, color='grey')
-	# plt.title('Decomposition of SP350: Trend + Seasonal + Resid')
-	# plt.legend()	
-	# plt.show()
-	
-if bPlot: 
-	plt.plot(gSP350EurTrend)
-	plt.plot(gREATrend, color='red')
-	plt.title('Trend')
-	plt.legend()	
-	plt.show()
-
-if bPlot: 
-	plt.plot(gSP350EurSeasonal)
-	plt.plot(gREASeasonal, color='red')
-	plt.title('Seasonal')
-	plt.legend()	
-	plt.show()
-
-if bPlot: 
-	plt.plot(gSP350EurSeasonal + gSP350EurTrend)
-	plt.plot(gREASeasonal + gREATrend, color='red')
-	plt.title('Trend + Seasonal')
-	plt.legend()
-	plt.show()
-
-    
-strLogFile = strPrjPath + " /gSP350EurSeasonal.csv"
-fnWriteIntermediateLog(gSP350EurSeasonal.values, strLogFile)	
-
-strLogFile = strPrjPath + " /gREASeasonal.csv"
-fnWriteIntermediateLog(gREASeasonal.values, strLogFile)
-
-(gSP350EurTrend).dropna(inplace=True)
-(gREATrend).dropna(inplace=True)
-
-# output correlation coefficient
-rCorr = np.corrcoef(gSP350EurSeasonal.values, gREASeasonal.values)
-rCorr = pearsonr(gSP350EurTrend.values, gREATrend.values)[0]
-
-
-
-print()
-
+# example on how to use distance between time series
+# x = [0,0,0,0,1,1,2,2,3,2,1,1,0,0,0,0]
+# y = [0,0,1,1,2,2,3,3,3,3,2,2,1,1,0,0]
+# dist, cost, path = mlpy.dtw_std(x, y, dist_only=False)
+# dist, cost, path = mlpy.dtw_std(gSP350Eur, gREA, dist_only=False)
 
 # access particular data points
+'''
+	#1. Specific the index as a string constant:
+	gSP350Eur['2015-10-01']
+	#2. Import the datetime library and use 'datetime' function:
+	gSP350Eur[datetime(2015,5,7)]
+	#3. Specify the entire range:
+	gSP350Eur['2015-05-06':'1949-05-01']
+	#4. Use ':' if one of the indices is at ends:
+	gSP350Eur[:'1949-05-01']
+	#5. Whole year 
+	gSP350Eur['2015']
+'''
 
-#1. Specific the index as a string constant:
-gSP350Eur['2015-10-01']
-#2. Import the datetime library and use 'datetime' function:
-gSP350Eur[datetime(2015,5,7)]
-#3. Specify the entire range:
-gSP350Eur['2015-05-06':'1949-05-01']
-#4. Use ':' if one of the indices is at ends:
-gSP350Eur[:'1949-05-01']
-#5. Whole year 
-gSP350Eur['2015']
+# mean-std scaled original time series
+gSP350EurScaled	= fnScaleData(gSP350Eur)
 
-# check if time series is stationarity
+# # to go back to original unscaled time series
+# rMean	= np.mean(gSP350Eur)
+# rStd	= np.std(gSP350Eur)
+# gSP350EurOriginal = fnUnScaleData(fnScaleData(gSP350Eur),rMean,rStd)
+
+if bLog:	
+	strLogFile = strOutPath + " gSP350EurScaled.csv"
+	fnWriteIntermediateLog(gSP350EurScaled.values, strLogFile)	
+
+# # output correlation coefficient
+# rCorr = np.corrcoef(gSP350EurSeasonal.values, gREASeasonal.values)
+# rCorr = pearsonr(gSP350EurTrend.values, gREATrend.values)[0]
+
+# check if time series is stationary
 nStep = 12
 for iWindow in range(1, nStep*6, nStep):
-	gSP350EurMovingAverage = gSP350Eur.rolling(window = iWindow,center=False).mean()
+	gSP350EurMovingAverage = gSP350EurScaled.rolling(window = iWindow,center=False).mean()
 	plt.plot(gSP350EurMovingAverage)
 
 if bPlot:
 	plt.title("rolling mean values with the step '" + str(nStep) + "' to limit of '" + str(nStep*6) + "'")
 	plt.show()
 
-fnTestStationarity(gSP350Eur)
-
-# make a time series stationary by applying the function
-# gSP350EurTransformed = np.log(gSP350Eur)
-gSP350EurTransformed = np.sqrt(gSP350Eur)
-# gSP350EurTransformed = gSP350Eur
+# apply the transformation function to make time series stationary 
+# gSP350EurTransformed = np.log(gSP350EurScaled)
+# gSP350EurTransformed = np.sqrt(gSP350EurScaled)
+gSP350EurTransformed = gSP350EurScaled
 
 if bPlot: 
-	plt.plot(gSP350Eur)
+	plt.plot(gSP350EurScaled)
 	plt.plot(gSP350EurTransformed, color='red')
 	plt.show()
 
@@ -203,7 +147,7 @@ if bPlot:
 # decomposing time series
 gSP350EurTransformedDecompose = seasonal_decompose(gSP350EurTransformed, freq = 12)
 
-gSP350EurTrend	= gSP350EurTransformedDecompose.trend
+gSP350EurTrend		= gSP350EurTransformedDecompose.trend
 gSP350EurSeasonal	= gSP350EurTransformedDecompose.seasonal
 gSP350EurResidual	= gSP350EurTransformedDecompose.resid
 
@@ -221,14 +165,21 @@ if bPlot:
 	plt.plot(gSP350EurResidual, label='Residuals')
 	plt.legend(loc='best')
 	plt.tight_layout()
-
+	plt.show()	
 
 # apply differencing
 gSP350EurTransformedDiff = gSP350EurTransformed - gSP350EurTransformed.shift()
-
 gSP350EurTransformedDiff.dropna(inplace=True)
+
+gT = gSP350EurTransformedDiff.shift()
+gT.dropna(inplace=True)
+
+pearsonr((gSP350EurTransformedDiff.values)[1:], gT.values)[0]
+
+
 if bPlot:
 	plt.plot(gSP350EurTransformedDiff)
+	plt.show()
 
 fnTestStationarity(gSP350EurTransformedDiff)
 
@@ -238,6 +189,11 @@ gLagACF		= acf(gSP350EurTransformed, nlags = 20)
 
 gLagPACF	= pacf(gSP350EurTransformed, nlags = 20, method = 'ols')
 # gLagPACF	= pacf(gSP350EurTransformedDiff, nlags = 20, method = 'ols')
+
+# # output correlation coefficient
+# rCorr = np.corrcoef(gSP350EurTransformed.values, gSP350EurTransformed.values)
+# rCorr = pearsonr(gSP350EurTransformed.values, gSP350EurTransformed.values)[0]
+
 
 #Plot ACF: 
 plt.subplot(121) 
@@ -256,6 +212,7 @@ plt.axhline(y=1.96/np.sqrt(len(gSP350EurTransformedDiff)),linestyle='--',color='
 plt.title('partial autocorrelation function')
 
 plt.tight_layout()
+plt.show()
 
 # # option-1
 # model = ARIMA(gSP350EurTransformed, order=(2, 1, 0))  

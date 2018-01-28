@@ -18,11 +18,13 @@ readline.parse_and_bind("tab: complete")
 pprint(sys.path)
 
 # path to all project foldres
-strDataPath = strPrjPath + '/data/'
-strDataCode = strPrjPath + '/code/'
+strDataPath	= strPrjPath + '/data/'
+strCodePath	= strPrjPath + '/code/'
+strOutPath	= strPrjPath + '/out/'
 
 sys.path.insert(0, strDataPath)
-sys.path.insert(0, strDataCode)
+sys.path.insert(0, strCodePath)
+sys.path.insert(0, strOutPath)
 
 # 2. two new sys.paths to look for modules should be added 
 pprint(sys.path)
